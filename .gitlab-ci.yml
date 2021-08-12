@@ -1,0 +1,26 @@
+image: python:latest
+
+stages:
+  - test
+  - build
+  - deploy
+
+test_app:
+  stage: test
+  script: 
+    - apt-get install -y python-dev python-pip
+    - pip install -r requirements.txt
+    - python app.py test
+
+build_app:
+  stage: build
+  script:
+   - docker build -t app-image .
+
+
+deploy_to_registry:
+  stage: deploy
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker -t app-image  $CI_REGISTRY/exercise-group/devops-project/app-image:latest
+    - docker push $CI_REGISTRY/exercise-group/devops-project/app-image:latest
